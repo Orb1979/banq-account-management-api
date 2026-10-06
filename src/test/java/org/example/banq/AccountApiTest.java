@@ -50,6 +50,28 @@ class AccountApiTest {
 				.andExpect(jsonPath("$.detail").value("Account number already exists"));
 	}
 
+	@Test
+	void createAccountRejectsMissingAccountNumber() throws Exception {
+		mockMvc.perform(post("/api/v1/accounts")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"name":"%s"}
+								""".formatted(NAME)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.detail").value("Account number must match NL25BANQ followed by 10 digits"));
+	}
+
+	@Test
+	void createAccountRejectsNullAccountNumber() throws Exception {
+		mockMvc.perform(post("/api/v1/accounts")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"name":"%s","accountNumber":null}
+								""".formatted(NAME)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.detail").value("Account number must match NL25BANQ followed by 10 digits"));
+	}
+
 	private static String accountJson() {
 		return """
 				{"name":"%s","accountNumber":"%s"}

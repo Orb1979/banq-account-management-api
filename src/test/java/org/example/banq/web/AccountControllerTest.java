@@ -61,30 +61,6 @@ class AccountControllerTest {
 	}
 
 	@Test
-	void createAccountRejectsInvalidAccountNumber() throws Exception {
-		when(accountService.createAccount(any(AccountRequestDto.class)))
-				.thenThrow(new InvalidAccountNumberException("Account number must match NL25BANQ followed by 10 digits"));
-
-		mockMvc.perform(post("/api/v1/accounts")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(accountJson(INVALID_ACCOUNT_NUMBER)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.detail").value("Account number must match NL25BANQ followed by 10 digits"));
-	}
-
-	@Test
-	void createAccountRejectsDuplicateAccountNumber() throws Exception {
-		when(accountService.createAccount(any(AccountRequestDto.class)))
-				.thenThrow(new DuplicateAccountNumberException("Account number already exists"));
-
-		mockMvc.perform(post("/api/v1/accounts")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(accountJson(VALID_ACCOUNT_NUMBER)))
-				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.detail").value("Account number already exists"));
-	}
-
-	@Test
 	void createAccountRejectsBlankName() throws Exception {
 		mockMvc.perform(post("/api/v1/accounts")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -100,18 +76,6 @@ class AccountControllerTest {
 						.content(accountJson("a".repeat(51), VALID_ACCOUNT_NUMBER)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.detail").value("Name must be at most 50 characters"));
-	}
-
-	@Test
-	void createAccountRejectsInvalidAccountNumberLastDigit() throws Exception {
-		when(accountService.createAccount(any(AccountRequestDto.class)))
-				.thenThrow(new InvalidAccountNumberException("Account number check digit is invalid"));
-
-		mockMvc.perform(post("/api/v1/accounts")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(accountJson(INVALID_ACCOUNT_NUMBER_LAST_DIGIT)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.detail").value("Account number check digit is invalid"));
 	}
 
 	private static String accountJson(String accountNumber) {

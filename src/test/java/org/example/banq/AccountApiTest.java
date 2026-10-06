@@ -1,5 +1,6 @@
 package org.example.banq;
 
+import static org.example.banq.AccountNumbers.INVALID_ACCOUNT_NUMBER_LAST_DIGIT;
 import static org.example.banq.AccountNumbers.VALID_ACCOUNT_NUMBER;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,6 +49,17 @@ class AccountApiTest {
 						.content(accountJson()))
 				.andExpect(status().isConflict())
 				.andExpect(jsonPath("$.detail").value("Account number already exists"));
+	}
+
+	@Test
+	void createAccountRejectsInvalidCheckDigit() throws Exception {
+		mockMvc.perform(post("/api/v1/accounts")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"name":"%s","accountNumber":"%s"}
+								""".formatted(NAME, INVALID_ACCOUNT_NUMBER_LAST_DIGIT)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.detail").value("Account number check digit is invalid"));
 	}
 
 	@Test

@@ -2,6 +2,7 @@ package org.example.banq.web;
 
 import org.example.banq.dto.AccountRequestDto;
 import org.example.banq.dto.AccountResponseDto;
+import org.example.banq.exception.DuplicateAccountNumberException;
 import org.example.banq.exception.InvalidAccountNumberException;
 import org.example.banq.service.AccountService;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,18 @@ class AccountControllerTest {
 						.content(accountJson(INVALID_ACCOUNT_NUMBER)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.detail").value("Account number must match NL25BANQ followed by 10 digits"));
+	}
+
+	@Test
+	void createAccountRejectsDuplicateAccountNumber() throws Exception {
+		when(accountService.createAccount(any(AccountRequestDto.class)))
+				.thenThrow(new DuplicateAccountNumberException("Account number already exists"));
+
+		mockMvc.perform(post("/api/v1/accounts")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(accountJson(VALID_ACCOUNT_NUMBER)))
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.detail").value("Account number already exists"));
 	}
 
 	@Test

@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.banq.dto.AccountRequestDto;
 import org.example.banq.dto.AccountResponseDto;
 import org.example.banq.entity.Account;
+import org.example.banq.exception.DuplicateAccountNumberException;
 import org.example.banq.exception.InvalidAccountNumberException;
 import org.example.banq.repository.AccountRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +20,7 @@ public class AccountService {
 	private static final Pattern ACCOUNT_NUMBER = Pattern.compile("NL25BANQ\\d{10}");
 	private static final String FORMAT_MESSAGE = "Account number must match NL25BANQ followed by 10 digits";
 	private static final String CHECK_DIGIT_MESSAGE = "Account number check digit is invalid";
+	private static final String DUPLICATE_MESSAGE = "Account number already exists";
 	private static final int DIGITS_START = 8;
 	private static final int DIGITS_END = 17;
 	private static final int CHECK_DIGIT_INDEX = 17;
@@ -32,6 +35,9 @@ public class AccountService {
 
 	public AccountResponseDto createAccount(AccountRequestDto request) {
 		validateAccountNumber(request.accountNumber());
+		if (accountRepository.existsByAccountNumber(request.accountNumber())) {
+			throw new DuplicateAccountNumberException(DUPLICATE_MESSAGE);
+		}
 
 		Account account = new Account();
 		account.setName(request.name());

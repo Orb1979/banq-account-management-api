@@ -9,9 +9,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.springframework.dao.DataIntegrityViolationException;
+
 import org.example.banq.dto.AccountRequestDto;
 import org.example.banq.dto.AccountResponseDto;
 import org.example.banq.entity.Account;
+import org.example.banq.exception.DuplicateAccountNumberException;
 import org.example.banq.exception.InvalidAccountNumberException;
 import org.example.banq.repository.AccountRepository;
 import org.junit.jupiter.api.Test;
@@ -52,6 +55,19 @@ class AccountServiceTest {
 
 		// Verify
 		assertEquals("Account number check digit is invalid", exception.getMessage());
+	}
+
+	@Test
+	void rejectsDuplicateAccountNumber() {
+		// Arrange
+		when(accountRepository.existsByAccountNumber(VALID_ACCOUNT_NUMBER)).thenReturn(true);
+
+		// Act
+		DuplicateAccountNumberException exception = assertThrows(DuplicateAccountNumberException.class,
+				() -> accountService.createAccount(new AccountRequestDto("test name", VALID_ACCOUNT_NUMBER)));
+
+		// Verify
+		assertEquals("Account number already exists", exception.getMessage());
 	}
 
 	@Test

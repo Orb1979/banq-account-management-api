@@ -71,6 +71,22 @@ class AccountServiceTest {
 	}
 
 	@Test
+	void mapsUniqueConstraintViolationToDuplicateAccount() {
+		// Arrange: existsByAccountNumber
+		DataIntegrityViolationException constraintViolation =
+				new DataIntegrityViolationException("uk_account_account_number");
+ 		when(accountRepository.save(any(Account.class))).thenThrow(constraintViolation);
+
+		// Act
+		DuplicateAccountNumberException exception = assertThrows(DuplicateAccountNumberException.class,
+				() -> accountService.createAccount(new AccountRequestDto("test name", VALID_ACCOUNT_NUMBER)));
+
+		// Verify
+		assertEquals("Account number already exists", exception.getMessage());
+		assertEquals(constraintViolation, exception.getCause());
+	}
+
+	@Test
 	void rejectsAccountNumberWithWrongFormat() {
 		// Arrange + Act
 		InvalidAccountNumberException exception = assertThrows(InvalidAccountNumberException.class,

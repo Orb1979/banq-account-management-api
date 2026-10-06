@@ -42,7 +42,11 @@ public class AccountService {
 		Account account = new Account();
 		account.setName(request.name());
 		account.setAccountNumber(request.accountNumber());
-		return toResponse(accountRepository.save(account));
+		try {
+			return toResponse(accountRepository.save(account));
+		} catch (DataIntegrityViolationException exception) {
+			throw new DuplicateAccountNumberException(DUPLICATE_MESSAGE, exception);
+		}
 	}
 
 	private void validateAccountNumber(String accountNumber) {

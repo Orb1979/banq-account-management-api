@@ -6,4 +6,8 @@ public class DuplicateAccountNumberException extends RuntimeException {
 		super(message);
 	}
 
+	public DuplicateAccountNumberException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

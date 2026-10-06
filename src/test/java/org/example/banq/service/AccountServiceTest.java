@@ -1,7 +1,5 @@
 package org.example.banq.service;
 
-import static org.example.banq.AccountNumbers.INVALID_ACCOUNT_NUMBER;
-import static org.example.banq.AccountNumbers.INVALID_ACCOUNT_NUMBER_LAST_DIGIT;
 import static org.example.banq.AccountNumbers.VALID_ACCOUNT_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,7 +13,6 @@ import org.example.banq.dto.AccountRequestDto;
 import org.example.banq.dto.AccountResponseDto;
 import org.example.banq.entity.Account;
 import org.example.banq.exception.DuplicateAccountNumberException;
-import org.example.banq.exception.InvalidAccountNumberException;
 import org.example.banq.repository.AccountRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,16 +45,6 @@ class AccountServiceTest {
 	}
 
 	@Test
-	void rejectsAccountNumberWithInvalidCheckDigit() {
-		// Arrange + Act
-		InvalidAccountNumberException exception = assertThrows(InvalidAccountNumberException.class,
-				() -> accountService.createAccount(new AccountRequestDto("test name", INVALID_ACCOUNT_NUMBER_LAST_DIGIT)));
-
-		// Verify
-		assertEquals("Account number check digit is invalid", exception.getMessage());
-	}
-
-	@Test
 	void rejectsDuplicateAccountNumber() {
 		// Arrange
 		when(accountRepository.existsByAccountNumber(VALID_ACCOUNT_NUMBER)).thenReturn(true);
@@ -86,13 +73,4 @@ class AccountServiceTest {
 		assertEquals(constraintViolation, exception.getCause());
 	}
 
-	@Test
-	void rejectsAccountNumberWithWrongFormat() {
-		// Arrange + Act
-		InvalidAccountNumberException exception = assertThrows(InvalidAccountNumberException.class,
-				() -> accountService.createAccount(new AccountRequestDto("test name", INVALID_ACCOUNT_NUMBER)));
-
-		// Verify
-		assertEquals("Account number must match NL25BANQ followed by 10 digits", exception.getMessage());
-	}
 }

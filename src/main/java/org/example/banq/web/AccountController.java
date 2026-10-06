@@ -7,6 +7,7 @@ import org.example.banq.dto.AccountRequestDto;
 import org.example.banq.dto.AccountResponseDto;
 import org.example.banq.service.AccountService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +25,7 @@ public class AccountController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public AccountResponseDto createAccount(@RequestBody AccountRequestDto request) {
+	public AccountResponseDto createAccount(@Validated @RequestBody AccountRequestDto request) {
 		return accountService.createAccount(request);
 	}
 

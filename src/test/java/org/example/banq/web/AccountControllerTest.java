@@ -85,6 +85,24 @@ class AccountControllerTest {
 	}
 
 	@Test
+	void createAccountRejectsBlankName() throws Exception {
+		mockMvc.perform(post("/api/v1/accounts")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(accountJson("   ", VALID_ACCOUNT_NUMBER)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.detail").value("Name is required"));
+	}
+
+	@Test
+	void createAccountRejectsTooLongName() throws Exception {
+		mockMvc.perform(post("/api/v1/accounts")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(accountJson("a".repeat(51), VALID_ACCOUNT_NUMBER)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.detail").value("Name must be at most 50 characters"));
+	}
+
+	@Test
 	void createAccountRejectsInvalidAccountNumberLastDigit() throws Exception {
 		when(accountService.createAccount(any(AccountRequestDto.class)))
 				.thenThrow(new InvalidAccountNumberException("Account number check digit is invalid"));
@@ -97,9 +115,13 @@ class AccountControllerTest {
 	}
 
 	private static String accountJson(String accountNumber) {
+		return accountJson(NAME, accountNumber);
+	}
+
+	private static String accountJson(String name, String accountNumber) {
 		return """
 				{"name":"%s","accountNumber":"%s"}
-				""".formatted(NAME, accountNumber);
+				""".formatted(name, accountNumber);
 	}
 
 }

@@ -4,8 +4,11 @@ import org.example.banq.exception.DuplicateAccountNumberException;
 import org.example.banq.exception.InvalidAccountNumberException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Objects;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -18,5 +21,11 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(DuplicateAccountNumberException.class)
 	public ProblemDetail handleDuplicateAccountNumber(DuplicateAccountNumberException exception) {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ProblemDetail handleValidation(MethodArgumentNotValidException exception) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+				Objects.requireNonNull(exception.getFieldError()).getDefaultMessage());
 	}
 }

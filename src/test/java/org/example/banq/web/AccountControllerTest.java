@@ -43,7 +43,7 @@ class AccountControllerTest {
 		mockMvc.perform(post("/api/v1/accounts")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(accountJson(VALID_ACCOUNT_NUMBER)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value(NAME))
 				.andExpect(jsonPath("$.accountNumber").value(VALID_ACCOUNT_NUMBER))
 				.andExpect(jsonPath("$.id").isNumber());

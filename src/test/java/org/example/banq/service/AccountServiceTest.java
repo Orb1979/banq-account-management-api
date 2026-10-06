@@ -59,7 +59,7 @@ class AccountServiceTest {
 
 	@Test
 	void mapsUniqueConstraintViolationToDuplicateAccount() {
-		// Arrange: existsByAccountNumber
+		// Arrange
 		DataIntegrityViolationException constraintViolation =
 				new DataIntegrityViolationException("uk_account_account_number");
  		when(accountRepository.save(any(Account.class))).thenThrow(constraintViolation);

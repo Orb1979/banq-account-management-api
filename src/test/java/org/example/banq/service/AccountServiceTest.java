@@ -29,7 +29,6 @@ class AccountServiceTest {
 	@Test
 	void acceptsAccountNumberWithValidCheckDigit() {
 		// Arrange
-		AccountRepository accountRepository = mock(AccountRepository.class);
 		when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> {
 			Account account = invocation.getArgument(0);
 			account.setId(1L);

@@ -36,8 +36,8 @@ class AccountServiceTest {
 		});
 
 		// Act
-		AccountService service = new AccountService(accountRepository);
-		AccountResponseDto response = service.createAccount(new AccountRequestDto("test name", VALID_ACCOUNT_NUMBER));
+		AccountResponseDto response = accountService.createAccount(
+				new AccountRequestDto("test name", VALID_ACCOUNT_NUMBER));
 
 		// Verify
 		assertEquals(VALID_ACCOUNT_NUMBER, response.accountNumber());

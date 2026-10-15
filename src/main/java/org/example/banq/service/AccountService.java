@@ -22,7 +22,7 @@ public class AccountService {
 
 	public List<AccountResponseDto> getAccounts() {
 		return accountRepository.findAll().stream()
-				.map(this::toResponse)
+				.map(AccountService::toResponse)
 				.toList();
 	}
 
@@ -36,13 +36,13 @@ public class AccountService {
 		account.setName(request.name());
 		account.setAccountNumber(request.accountNumber());
 		try {
-			return toResponse(accountRepository.save(account));
+			return AccountService.toResponse(accountRepository.save(account));
 		} catch (DataIntegrityViolationException exception) {
 			throw new DuplicateAccountNumberException(DUPLICATE_MESSAGE, exception);
 		}
 	}
 
-	private AccountResponseDto toResponse(Account account) {
+	private static AccountResponseDto toResponse(Account account) {
 		return new AccountResponseDto(account.getId(), account.getName(), account.getAccountNumber());
 	}
 }
